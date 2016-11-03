@@ -41,7 +41,7 @@ namespace Slack.Webhooks.Tests
             var result = client.Post(slackMessage);
 
             //assert
-            Assert.False(result);
+            Assert.False(result.Ok);
         }
 
         [Fact]

@@ -67,6 +67,9 @@
     <Compile Include="SlackField.cs" />
     <Compile Include="SlackMessage.cs" />
     <Compile Include="ParseMode.cs" />
+    <Compile Include="SlackResponses\SlackGeneralResponse.cs" />
+    <Compile Include="SlackResponses\SlackResponse.cs" />
+    <Compile Include="SlackResponses\SlackRevokeResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

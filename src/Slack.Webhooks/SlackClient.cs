@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using RestSharp;
 using ServiceStack.Text;
+using Slack.Webhooks.SlackResponses;
 
 #if NET40
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace Slack.Webhooks
         /// <summary>
         /// Returns the RestClient's current Timeout value.
         /// </summary>
-        internal int TimeoutMs { get { return _restClient.Timeout; } }
+        internal int TimeoutMs => _restClient.Timeout;
 
         public SlackClient(string webhookUrl, int timeoutSeconds = 100)
         {
@@ -53,7 +53,7 @@ namespace Slack.Webhooks
             propertyConvention.SetValue(scope, enumValue, null);
         }
 
-        public virtual bool Post(SlackMessage slackMessage)
+        public virtual SlackResponse Post(SlackMessage slackMessage)
         {
             var request = new RestRequest(_webhookUri.PathAndQuery, Method.POST);
             using (var scope = JsConfig.BeginScope())
@@ -67,11 +67,11 @@ namespace Slack.Webhooks
                 try
                 {
                     var response = _restClient.Execute(request);
-                    return response.StatusCode == HttpStatusCode.OK && response.Content == POST_SUCCESS;
+                    return JsonSerializer.DeserializeFromString<SlackResponse>(response.Content);
                 }
                 catch (Exception)
                 {
-                    return false;
+                    return new SlackResponse { Error = "Exception thrown", Ok = false };
                 }
             }
         }
@@ -80,7 +80,7 @@ namespace Slack.Webhooks
         {
             return channels.DefaultIfEmpty(message.Channel)
                     .Select(message.Clone)
-                    .Select(Post).All(r => r);
+                    .Select(Post).All(r => r.Ok);
         }
 
 #if NET40
